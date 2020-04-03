@@ -21,3 +21,26 @@ docker-compose.yml
 3. mysql:8.0.16
 
 4. redis:5.0.8
+
+## 【常用命令】
+
+### 查看所有容器（包括未运行）
+docker ps -a
+
+### 查看所有镜像
+docker images
+
+### 启动docker-compose.yml
+docker-compose --compatibility up -d
+
+### 删除已运行的容器和网络
+docker-compose down
+
+### 重启所有容器
+docker restart $(docker ps -aq)
+
+### 删除所有容器
+docker rm -f $(docker ps -aq)
+
+### 删除所有镜像
+docker rmi $(docker images -q)
