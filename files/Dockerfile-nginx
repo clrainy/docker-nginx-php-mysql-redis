@@ -1,0 +1,5 @@
+FROM nginx:1.17.9
+
+#标明著作人的名称和邮箱
+MAINTAINER cdyun
+

@@ -1,0 +1,115 @@
+version: '3'
+services:
+  web:
+    container_name: "web"
+    restart: always
+    build: 
+     context: ./files
+     dockerfile: Dockerfile-nginx
+    image: demo-nginx:1.17.9
+    volumes:
+      - "./web/html:/usr/share/nginx/html"
+      - "./web/nginx:/etc/nginx/conf.d"
+      - "./logs/web:/var/log/nginx"
+    ports:
+      - "8081:80"
+    deploy:
+     resources:
+        limits:
+           memory: 50M
+        reservations:
+           memory: 25M
+    networks:
+      - pro
+
+  demo-fpm:
+    container_name: "demo-fpm"
+    restart: always
+    build:
+     context: ./files
+     dockerfile: Dockerfile-php
+    image: demo-fpm:php74
+    volumes:
+      - "./demo/html:/www"
+      - "./demo/php:/usr/local/etc/php/conf.d"
+    ports:
+      - "9000:9000"
+    deploy:
+     resources:
+        limits:
+           memory: 100M
+        reservations:
+           memory: 50M
+    depends_on:
+      - web
+    networks:
+      - pro
+
+  demo:
+    container_name: "demo"
+    restart: always
+    image: demo-nginx:1.17.9
+    volumes:
+      - "./demo/html:/usr/share/nginx/html"
+      - "./demo/nginx:/etc/nginx/conf.d"
+      - "./logs/demo:/var/log/nginx"
+    ports:
+      - "8082:80"
+    deploy:
+     resources:
+        limits:
+           memory: 50M
+        reservations:
+           memory: 25M
+    depends_on:
+      - web
+      - demo-fpm
+    links:
+      - demo-fpm:php
+    networks:
+      - pro
+
+  mysql:
+    container_name: "mysql"
+    restart: always
+    image: mysql:8.0.18
+    depends_on:
+      - web
+    volumes:
+      - "./mysql/conf.d:/etc/mysql/conf.d"
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_DATABASE=test
+      - MYSQL_ROOT_PASSWORD=123456
+    deploy:
+     resources:
+        limits:
+           memory: 450M
+        reservations:
+           memory: 300M
+    networks:
+      - pro
+
+  redis:
+    container_name: "redis"
+    restart: always
+    image: redis:5.0.8
+    expose:
+      - "6379"
+    ports:
+      - "6379:6379"
+    deploy:
+     resources:
+        limits:
+           memory: 200M
+        reservations:
+           memory: 100M
+    command: redis-server --appendonly yes 
+    networks:
+      - pro
+ 
+networks:
+  pro:
+    driver: bridge
+
