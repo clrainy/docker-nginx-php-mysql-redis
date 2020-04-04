@@ -1,11 +1,12 @@
 version: '3'
+
 services:
   web:
     container_name: "web"
     restart: always
-    build: 
-     context: ./files
-     dockerfile: Dockerfile-nginx
+    build:
+      context: ./files
+      dockerfile: Dockerfile-nginx
     image: demo-nginx:1.17.9
     volumes:
       - "./web/html:/usr/share/nginx/html"
@@ -14,11 +15,11 @@ services:
     ports:
       - "8081:80"
     deploy:
-     resources:
+      resources:
         limits:
-           memory: 50M
+          memory: 50M
         reservations:
-           memory: 25M
+          memory: 25M
     networks:
       - pro
 
@@ -26,20 +27,14 @@ services:
     container_name: "demo-fpm"
     restart: always
     build:
-     context: ./files
-     dockerfile: Dockerfile-php
+      context: ./files
+      dockerfile: Dockerfile-php
     image: demo-fpm:php74
     volumes:
       - "./demo/html:/www"
       - "./demo/php:/usr/local/etc/php/conf.d"
     ports:
       - "9000:9000"
-    deploy:
-     resources:
-        limits:
-           memory: 100M
-        reservations:
-           memory: 50M
     depends_on:
       - web
     networks:
@@ -56,11 +51,11 @@ services:
     ports:
       - "8082:80"
     deploy:
-     resources:
+      resources:
         limits:
-           memory: 50M
+          memory: 50M
         reservations:
-           memory: 25M
+          memory: 25M
     depends_on:
       - web
       - demo-fpm
@@ -83,11 +78,11 @@ services:
       - MYSQL_DATABASE=test
       - MYSQL_ROOT_PASSWORD=123456
     deploy:
-     resources:
+      resources:
         limits:
-           memory: 450M
+          memory: 450M
         reservations:
-           memory: 300M
+          memory: 300M
     networks:
       - pro
 
@@ -100,15 +95,15 @@ services:
     ports:
       - "6379:6379"
     deploy:
-     resources:
+      resources:
         limits:
-           memory: 200M
+          memory: 200M
         reservations:
-           memory: 100M
-    command: redis-server --appendonly yes 
+          memory: 100M
+    command: redis-server --appendonly yes
     networks:
       - pro
- 
+
 networks:
   pro:
     driver: bridge
